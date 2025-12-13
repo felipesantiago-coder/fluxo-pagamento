@@ -7,48 +7,48 @@ import { Shield, Zap, Palette, CheckCircle, Code, Cloud, Server, Cpu, Globe, Arr
 export default function Home() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     
     // Verificar se usuário já está autenticado
-    const token = localStorage.getItem('authToken');
-    const user = localStorage.getItem('user');
-    
-    if (token && user) {
-      try {
-        const userData = JSON.parse(user);
-        
-        // Se 2FA está configurado mas não verificado, redirecionar para verificação
-        if (userData.twoFactorEnabled) {
-          router.push('/2fa-verify');
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('authToken');
+      const user = localStorage.getItem('user');
+      
+      if (token && user) {
+        try {
+          const userData = JSON.parse(user);
+          
+          // Se 2FA está configurado mas não verificado, redirecionar para verificação
+          if (userData.twoFactorEnabled) {
+            setRedirecting(true);
+            router.push('/2fa-verify');
+            return;
+          }
+          
+          // Se 2FA não está configurado, redirecionar para configuração
+          setRedirecting(true);
+          router.push('/2fa-setup');
+          return;
+        } catch (error) {
+          // Se houver erro nos dados, redirecionar para login
+          setRedirecting(true);
+          router.push('/login');
           return;
         }
-        
-        // Se 2FA não está configurado, redirecionar para configuração
-        router.push('/2fa-setup');
-        return;
-      } catch (error) {
-        // Se houver erro nos dados, redirecionar para login
-        router.push('/login');
-        return;
       }
     }
-    
-    // Se não está autenticado, redirecionar para login após mostrar a página
-    const timer = setTimeout(() => {
-      router.push('/login');
-    }, 3000);
-    
-    return () => clearTimeout(timer);
   }, [router]);
 
-  if (!mounted) {
+  // Show loading state only when redirecting
+  if (redirecting) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando...</p>
+          <p className="text-gray-600">Redirecionando...</p>
         </div>
       </div>
     );
