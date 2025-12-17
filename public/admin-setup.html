@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Setup - Real Estate</title>
+    <script>
+        // Admin User Creation Script
+        function createAdminUser() {
+            console.log('🔧 Creating admin user...');
+            
+            // Admin user data with hashed password
+            const adminUser = {
+                id: 'admin-001',
+                username: 'adminfluxo',
+                email: 'admin@realestate.com',
+                password: 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', // SHA256 of 'adminfluxo123'
+                twoFactorEnabled: false,
+                createdAt: new Date().toISOString()
+            };
+
+            try {
+                // Get existing auth data
+                const stored = localStorage.getItem('real_estate_auth');
+                let authData = {};
+                
+                if (stored) {
+                    try {
+                        authData = JSON.parse(atob(stored));
+                    } catch (e) {
+                        authData = {};
+                    }
+                }
+
+                // Add admin user if doesn't exist
+                if (!authData['adminfluxo']) {
+                    authData['adminfluxo'] = adminUser;
+                    localStorage.setItem('real_estate_auth', btoa(JSON.stringify(authData)));
+                    
+                    document.getElementById('result').innerHTML = `
+                        <div style="color: #16a34a; padding: 20px; border: 1px solid #16a34a; border-radius: 8px; background: #f0fdf4;">
+                            <h3>✅ Admin user created successfully!</h3>
+                            <p><strong>Username:</strong> adminfluxo</p>
+                            <p><strong>Password:</strong> adminfluxo123</p>
+                            <p><a href="/" style="color: #2563eb; text-decoration: underline;">Go to Login</a></p>
+                        </div>
+                    `;
+                    
+                    console.log('✅ Admin user created successfully!');
+                    console.log('Username: adminfluxo');
+                    console.log('Password: adminfluxo123');
+                } else {
+                    document.getElementById('result').innerHTML = `
+                        <div style="color: #dc2626; padding: 20px; border: 1px solid #dc2626; border-radius: 8px; background: #fef2f2;">
+                            <h3>ℹ️ Admin user already exists</h3>
+                            <p>The admin user is already created in the system.</p>
+                            <p><a href="/" style="color: #2563eb; text-decoration: underline;">Go to Login</a></p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <div style="color: #dc2626; padding: 20px; border: 1px solid #dc2626; border-radius: 8px; background: #fef2f2;">
+                        <h3>❌ Error creating admin user</h3>
+                        <p>An error occurred while creating the admin user.</p>
+                        <p><small>Check console for details.</small></p>
+                    </div>
+                `;
+                console.error('❌ Error:', error);
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏢 Admin Setup</h1>
+        <p class="subtitle">Create administrator account for Real Estate platform</p>
+        
+        <div style="background: #f1f5f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
+            <h3>This will create an admin user with:</h3>
+            <p><strong>Username:</strong> adminfluxo</p>
+            <p><strong>Password:</strong> adminfluxo123</p>
+            <p><strong>Email:</strong> admin@realestate.com</p>
+        </div>
+        
+        <button onclick="createAdminUser()">
+            Create Admin User
+        </button>
+        
+        <div id="result"></div>
+    </div>
+</body>
+</html>
