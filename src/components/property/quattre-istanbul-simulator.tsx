@@ -255,6 +255,7 @@ export function QuattreIstanbulSimulator() {
   // Update simulation when inputs change
   const updateSimulation = (field: keyof SimulationData, value: any) => {
     setSimulation(prev => ({ ...prev, [field]: value }))
+    calculatePaymentFlow()
   }
 
   // Handle currency input formatting
@@ -276,7 +277,6 @@ export function QuattreIstanbulSimulator() {
     } else {
       updateSimulation('downPaymentDate', e.target.value)
     }
-    calculatePaymentFlow()
   }
 
   // Calculate derived values
@@ -293,15 +293,17 @@ export function QuattreIstanbulSimulator() {
   const monthlyPaidDuringConstruction = simulation.monthlyInstallmentValue * monthlyInstallments
   const semesterPaidDuringConstruction = simulation.semesterInstallmentValue * finalSemesterInstallments
   
+  // Calculate total capture during construction
+  const totalCaptation = downPaymentValue + monthlyPaidDuringConstruction + semesterPaidDuringConstruction
+  const captationPercent = finalPropertyValue > 0 ? (totalCaptation / finalPropertyValue) * 100 : 0
+  
+  // Calculate habitese amount
+  const habiteseAmount = finalPropertyValue - totalCaptation
+  
   // Calculate remaining values
-  const habiteseAmount = finalPropertyValue - downPaymentValue - monthlyPaidDuringConstruction - semesterPaidDuringConstruction
   const monthlyRemaining = Math.max(0, (simulation.monthlyInstallmentValue * simulation.maxMonthlyInstallments) - monthlyPaidDuringConstruction)
   const semesterRemaining = Math.max(0, (simulation.semesterInstallmentValue * simulation.maxSemesterInstallments) - semesterPaidDuringConstruction)
   const balanceRemaining = Math.max(0, habiteseAmount - monthlyRemaining - semesterRemaining)
-  
-  // Calculate progress and warnings
-  const totalCaptation = downPaymentValue + monthlyPaidDuringConstruction + semesterPaidDuringConstruction
-  const captationPercent = finalPropertyValue > 0 ? (totalCaptation / finalPropertyValue) * 100 : 0
 
   return (
     <div className="min-h-screen bg-background">
@@ -680,7 +682,7 @@ export function QuattreIstanbulSimulator() {
 
                     <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded">
                       <p className="text-sm text-blue-800 dark:text-blue-200">
-                        <strong>Observação:</strong> O valor do Habite-se inclui:
+                        <strong>Observação:</strong> O valor do Habitese-se inclui:
                       </p>
                       <ul className="text-sm text-blue-800 dark:text-blue-200 mt-2 space-y-1">
                         <li>• Parcelas mensais restantes</li>
